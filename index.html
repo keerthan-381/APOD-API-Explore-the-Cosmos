@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astronomy Picture of the Day (APOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        header {
+            background-color: #3182ce;
+            color: #fff;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Ensure logos are aligned on both sides */
+            flex-wrap: wrap; /* Allow content to wrap on smaller screens */
+        }
+
+        header img {
+            max-width: 150px; /* Adjust the logo size */
+            height: auto;
+        }
+
+        header h1 {
+            margin: 0;
+            text-align: center;
+            flex-grow: 1; /* Make title take up remaining space */
+            font-size: 1.5rem;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap; /* Allow content to wrap */
+            margin: 20px auto;
+            max-width: 1800px;
+            width: 100%;
+        }
+
+        .sidebar {
+            flex: 1;
+            max-width: 500px;
+            padding: 20px;
+            background: #2d3748;
+            color: white;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar h2 {
+            color: #63b3ed;
+        }
+
+        .content {
+            flex: 3;
+            padding: 20px;
+            margin-left: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .content h2 {
+            color: #3182ce;
+            text-align: center;
+        }
+
+        input[type="password"], input[type="date"], input[type="number"] {
+            width: 95%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+        }
+
+        button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            width: 100%;
+            color: white;
+            background: #3182ce;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background: #2b6cb0;
+        }
+
+        .result {
+            margin-top: 20px;
+        }
+
+        .image {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .video iframe {
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.2rem; /* Smaller title font */
+            }
+
+            .container {
+                flex-direction: column; /* Stack sidebar and content vertically */
+                align-items: center;
+            }
+
+            .sidebar, .content {
+                width: 100%;
+                max-width: 100%;
+                margin-left: 0;
+            }
+
+            .content {
+                margin-top: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1rem; /* Smaller title font */
+            }
+
+            .sidebar {
+                padding: 15px;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            button {
+                font-size: 14px; /* Smaller button text */
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <!-- Left Logo -->
+        <img src="logo.png" alt="APOD Logo">
+        <h1>Astronomy Picture of the Day (APOD)</h1>
+        <!-- Right Logo -->
+        <img src="apod.png" alt="APOD Logo">
+    </header>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h2>APOD Query Options</h2>
+            <form id="apodForm">
+                <label for="apiKey">Enter your NASA API Key:</label>
+                <input type="password" id="apiKey" placeholder="API Key" required>
+
+                <label for="date">Select Date:</label>
+                <input type="date" id="date" min="1995-06-16" max="2025-01-07" required>
+
+                <label>
+                    <input type="checkbox" id="randomImages"> Random Images (Count)
+                </label>
+
+                <div id="countSection" style="display: none;">
+                    <label for="count">Number of Random Images:</label>
+                    <input type="number" id="count" min="1" max="10">
+                </div>
+
+                <button type="button" onclick="fetchAPOD()">Fetch APOD</button>
+            </form>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <h2>Astronomy Picture of the Day</h2>
+            <div id="results" class="result">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle Count Section
+        document.getElementById("randomImages").addEventListener("change", function () {
+            const countSection = document.getElementById("countSection");
+            countSection.style.display = this.checked ? "block" : "none";
+        });
+
+        // Fetch APOD Data
+        async function fetchAPOD() {
+            const apiKey = document.getElementById("apiKey").value;
+            const date = document.getElementById("date").value;
+            const randomImages = document.getElementById("randomImages").checked;
+            const count = document.getElementById("count").value;
+
+            if (!apiKey) {
+                alert("Please enter your NASA API Key.");
+                return;
+            }
+
+            const params = new URLSearchParams({ api_key: apiKey });
+
+            if (randomImages && count) {
+                params.append("count", count);
+            } else {
+                params.append("date", date);
+            }
+
+            const response = await fetch(`https://api.nasa.gov/planetary/apod?${params}`);
+
+            if (response.ok) {
+                const data = await response.json();
+                displayResults(data);
+            } else {
+                document.getElementById("results").innerHTML = `<p>Error: ${response.status}</p>`;
+            }
+        }
+
+        // Display APOD Results
+        function displayResults(data) {
+            const resultsContainer = document.getElementById("results");
+            resultsContainer.innerHTML = "";
+
+            const items = Array.isArray(data) ? data : [data];
+
+            items.forEach(item => {
+                const title = `<h3>${item.title || "No Title"}</h3>`;
+                const explanation = `<p>${item.explanation || "No Description Available"}</p>`;
+                let media = "";
+
+                if (item.media_type === "image") {
+                    media = `<div class="image"><img src="${item.url}" alt="APOD"></div>`;
+                } else if (item.media_type === "video") {
+                    media = `<div class="video"><iframe src="${item.url}" allowfullscreen></iframe></div>`;
+                } else {
+                    media = `<p>Unsupported media type.</p>`;
+                }
+
+                resultsContainer.innerHTML += `${title}${explanation}${media}`;
+            });
+        }
+    </script>
+</body>
+</html>
