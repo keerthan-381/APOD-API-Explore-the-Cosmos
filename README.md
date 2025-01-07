@@ -2,7 +2,7 @@
 
 This project allows users to view NASA's Astronomy Picture of the Day (APOD) using both a Streamlit app and an HTML interface. The app fetches daily astronomy images or videos from NASA's APOD API and displays them along with a description. Users can search for pictures from specific dates or fetch random images.
 
-You can also visit the live project [here]#https://keerthan-381.github.io/APOD-API-Explore-the-Cosmos/
+You can also visit the live project [here](#https://keerthan-381.github.io/APOD-API-Explore-the-Cosmos/)
 
 ## Table of Contents
 - [Overview](#overview)
